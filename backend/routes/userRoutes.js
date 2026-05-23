@@ -13,7 +13,6 @@ const uploadMiddleware = upload.fields([{name : 'avatar', maxCount : 1},{name : 
 
 
 router.post('/signup',Signup) 
-router.get('/verify/:verificationToken',Verify)
 router.post('/signin',Signin)
 router.get('/:userId',authMiddleware,getUserById)// get user by id
 router.get('/bulk',authMiddleware,getUsers)// get all users

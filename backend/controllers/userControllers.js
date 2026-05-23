@@ -10,83 +10,43 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 
+export const Signup = async (req, res) => {
+  const { username, email, password } = req.body
 
+  const { success } = signupValid.safeParse(req.body)
+  if (!success) {
+    return res.status(400).json({ message: "Enter valid inputs" })
+  }
 
-export const Verify = async(req,res)=>{
-    try{
-        const {verificationToken} = req.params
-        const user = await User.findOne({
-            verificationToken
-        })
-        if(!user){
-            return res.status(404).json({
-                msg : "User Not Found"
-            })
-        }
-        user.verified = true 
-        user.verificationToken = null
-        await user.save() 
-        return res.status(200).json({
-            msg: "Email Verified"
-        })
-    }catch(error) {
-        console.log(err)
-        return res.status(500).json({
-            msg: "Nodemailer Error"
-        })
+  try {
+    // 1. Check if email already exists
+    const existingUser = await User.findOne({ email })
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already exists" })
     }
-}
 
-export const Signup = async(req,res)=>{
-    const{username,email,password} = req.body
-    console.log(username,email,password)
-    const {success} = signupValid.safeParse(req.body) 
-    console.log(success)
-    if(!success){
-        return res.status(400).json({
-            message: "enter valid inputs"
-        })
-    }
-    try{
-        let user = await User.findOne({email})
-        if(user){
-            return res.status(409).json({
-                message : "Email  already exists"
-            })
-        }
-        const mailOptions = {
-            from : process.env.EMAIL_USER,
-            to : user.email,
-            subject : "HiveTalk : Email Verification",
-            html : `
-                  <h3>Verify Your Email</h3>
-                  <h3>Click below link to very your email address for HiveTalk</h3>
-                  <a href="http://localhost:3000/api/v1/user/verify/${verificationToken}">HiveTalk.com</a>`   
-        }
-        await transporter.sendMail(mailOptions)
-        const salt = await  bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(password,salt)
-        user = await User.create({
-            username,
-            email,
-            password:hashPassword
-        })
-        const verificationToken = uuidv4()
-        user.verificationToken = verificationToken
-        await user.save()
-        const userId = user._id
-        const token = jwt.sign({userId},JWT_TOKEN,{expiresIn:'1h'})
-        return res.status(200).json({
-            message : "user created ",
-            userId,
-            token : token
-        })
-    }catch(err){
-        console.log(err)
-        return res.status(500).json({
-            message : "User Signup Error"
-        })
-    }
+    const salt = await bcrypt.genSalt(10)
+    const hashPassword = await bcrypt.hash(password, salt)
+
+    // 4. Create the user
+    const user = await User.create({
+      username,
+      email,
+      password: hashPassword,
+    })
+
+    // 6. Sign JWT
+    const token = jwt.sign({ userId: user._id }, JWT_TOKEN, { expiresIn: "1h" })
+
+    return res.status(201).json({
+      message: "User created successfully",
+      userId: user._id,
+      token,
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ message: "User signup error" })
+  }
 }
 
 export const Signin = async(req,res)=>{
