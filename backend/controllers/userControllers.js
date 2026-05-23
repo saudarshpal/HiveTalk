@@ -3,7 +3,7 @@ import { signinValid, signupValid } from "../zod/userzod.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import cloudinary from "../config.js";
-import { JWT_TOKEN ,transporter } from "../config.js";
+import { JWT_TOKEN } from "../config.js";
 import {v4 as uuidv4 } from 'uuid' ;
 import Community from "../models/communityModel.js"
 import dotenv from 'dotenv'

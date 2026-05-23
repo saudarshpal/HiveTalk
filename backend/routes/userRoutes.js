@@ -1,5 +1,5 @@
 import express from "express";
-import { createProfile,deleteAccount,followUser, getCommunities, getUserById, getUsers, Signin, Signup, subscribe, unfollowUser, unSubscribe,Verify } from "../controllers/userControllers.js";
+import { createProfile,deleteAccount,followUser, getCommunities, getUserById, getUsers, Signin, Signup, subscribe, unfollowUser, unSubscribe} from "../controllers/userControllers.js";
 import multer from "multer";
 import { authMiddleware } from "../middlewares/auth.js";
 
