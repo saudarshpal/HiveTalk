@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-
-
 const userSchema = new mongoose.Schema({
     username : {
         type : String,
@@ -58,15 +56,7 @@ const userSchema = new mongoose.Schema({
                 default : null
             }
         }
-    },
-    verificationToken :{
-        type : String
-    },
-    verified : {
-        type : Boolean,
-        default : false,
     }
-
 })
 
 const User = mongoose.model('User',userSchema)
