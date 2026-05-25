@@ -1,25 +1,33 @@
-import express from 'express'
-import multer from 'multer'
-import { addModerator, createCommunity, deleteCommunity, followCommunity, getCommunities, getCommunityById, getcommunityPosts, unFollowCommunity, userCommunities } from '../controllers/communityControllers.js'
-import { authMiddleware } from '../middlewares/auth.js'
-
+import express from "express"
+import multer from "multer"
+import { authMiddleware } from "../middlewares/auth.js"
+import {
+  getCommunities,
+  getCommunityById,
+  getUserAdminCommunities,  
+  getCommunityPosts,        
+  createCommunity,
+  deleteCommunity,
+  followCommunity,
+  unFollowCommunity,
+  addModerator,
+} from "../controllers/communityControllers.js"
 
 const router = express.Router()
+
+const upload = multer({ dest: "/tmp/uploads/community/" })
+const uploadBanner = upload.single("communityBanner")
+
 router.use(authMiddleware)
 
-const upload =  multer({dest :'tmp/uploads/community/'})
-const uploadBanner = upload.single('communityBanner')
-
-
-router.get('/bulk',getCommunities) // get all communities
-router.get('/:communityId',getCommunityById)// get community by id
-router.get('/user/:userId',userCommunities) //user Subscribed communities
-router.put('/create',uploadBanner,createCommunity) //create community
-router.get('/posts/:communityId/',getcommunityPosts) // get all posts of a community 
-router.delete('/delete/:communityId',deleteCommunity) // delete a community
-router.post('/follow/:communityId',followCommunity) // follow community 
-router.post('/unfollow/:communityId',unFollowCommunity) //unfollow community
-router.put('/add-moderator/:communityId/:moderatorId',addModerator)// adds a moderator to community
-
+router.get("/bulk", getCommunities)
+router.get("/user/:userId", getUserAdminCommunities)
+router.post("/create", uploadBanner, createCommunity)    
+router.get("/:communityId", getCommunityById)
+router.get("/posts/:communityId", getCommunityPosts)     
+router.delete("/:communityId", deleteCommunity)          
+router.post("/follow/:communityId", followCommunity)
+router.delete("/unfollow/:communityId", unFollowCommunity) 
+router.put("/add-moderator/:communityId/:moderatorId", addModerator)
 
 export default router

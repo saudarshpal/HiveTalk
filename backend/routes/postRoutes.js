@@ -1,26 +1,27 @@
-import express from "express";
-import { commentOnPost, createPost, deleteComment, deletePost, getAllcomments, getAllPosts, getPostById, getUserPosts, voteOnComment, voteOnPost} from "../controllers/postController.js";
-import { authMiddleware } from "../middlewares/auth.js";
-import multer from "multer";
+import express from "express"
+import multer from "multer"
+import { authMiddleware } from "../middlewares/auth.js"
+import {
+  createPost,
+  getAllPosts,
+  getPostById,
+  getUserPosts,
+  deletePost,
+  voteOnPost,
+} from "../controllers/postControllers.js"
 
 const router = express.Router()
 
+const upload = multer({ dest: "/tmp/uploads/images/" })  
+const uploadImages = upload.single("postImage")          
+
 router.use(authMiddleware)
 
-const upload = multer({dest : 'tmp/uploads/images/'})
-const uploadImages = upload.array('postImages',10)
+router.get("/all", getAllPosts)
+router.get("/user/:userId", getUserPosts)
+router.post("/create", uploadImages, createPost)
+router.get("/:postId", getPostById)
+router.delete("/:postId", deletePost)                     
+router.post("/vote/:postId", voteOnPost)
 
-router.post('/create',uploadImages,createPost) // create a post
-router.get('/all',getAllPosts) // get all posts
-router.get('/user/:userId',getUserPosts) // get your posts
-router.get('/:postId',getPostById) // get post by id
-router.delete('/delete/:postId',deletePost) // delete a post
-router.post('/vote/:postId',voteOnPost) // vote on post
-router.post('/comment/:postId',commentOnPost) // comment on post
-router.get('/comments/:postId',getAllcomments) // get all comments on post
-router.delete('/comment/delete/:postId/:commentId',deleteComment) // delete comment
-router.post('/comment/vote/:postId/:commentId',voteOnComment)// vote on comment
-
-
-
-export default router;
+export default router
